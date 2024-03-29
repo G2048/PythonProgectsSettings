@@ -11,7 +11,7 @@ LogConfig = {
     'handlers': {
         'rotate': {
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'telegram.log',
+            'filename': 'log.log',
             'mode': 'w',
             'level': 'DEBUG',
             'maxBytes': 204800,
@@ -33,5 +33,13 @@ LogConfig = {
             'level': 'DEBUG',
             'handlers': ['console'],
         },
-    }
+        'sqlalchemy.engine': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+        },
+        'sqlalchemy.pool': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+        },
+    },
 }
