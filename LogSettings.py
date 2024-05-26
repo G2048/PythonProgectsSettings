@@ -6,7 +6,7 @@ import re
 class JSONFormatter(logging.Formatter):
     _pattern = re.compile('%\((\w+)\)s')
 
-    def formatMessage(self, record):
+    def formatMessage(self, record) -> str:
         ready_message: dict = {}
         values = record.__dict__
 
@@ -19,6 +19,14 @@ class JSONFormatter(logging.Formatter):
             ready_message.update({value: values.get(value)})
 
         return json.dumps(ready_message)
+
+
+class RouterFilter(logging.Filter):
+    endpoints = ('/metrics', '/health')
+
+    def filter(self, record) -> bool:
+        record.levelname = record.levelname.upper()
+        return len(record.args) > 2 or record.args[2] not in self.endpoints
 
 
 LogConfig = {
@@ -37,6 +45,11 @@ LogConfig = {
             'format': '%(asctime)s::%(levelname)s::%(filename)s::%(levelno)s::%(lineno)s::%(message)s',
         },
     },
+    'filters': {
+        'router': {
+            '()': 'LogSettings.RouterFilter',
+        },
+    },
     'handlers': {
         'rotate': {
             'class': 'logging.handlers.RotatingFileHandler',
@@ -46,18 +59,21 @@ LogConfig = {
             'maxBytes': 204800,
             'backupCount': 3,
             'formatter': 'details',
+            'filters': ['router'],
         },
         'console': {
             'class': 'logging.StreamHandler',
             'level': 'DEBUG',
             "stream": "ext://sys.stderr",
             'formatter': 'details',
+            'filters': ['router'],
         },
         'json_console': {
             'class': 'logging.StreamHandler',
             'level': 'DEBUG',
             "stream": "ext://sys.stderr",
             'formatter': 'json',
+            'filters': ['router'],
         },
     },
     'loggers': {
