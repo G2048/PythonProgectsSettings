@@ -1,3 +1,21 @@
+import json
+import logging
+import re
+
+
+class JSONFormatter(logging.Formatter):
+    _pattern = re.compile('%\((\w+)\)s')
+
+    def formatMessage(self, record):
+        ready_message: dict = {}
+        values = record.__dict__
+
+        for value in self._pattern.findall(self._fmt):
+            ready_message.update({value: values.get(value)})
+
+        return json.dumps(ready_message)
+
+
 LogConfig = {
     'version': 1,
     "disable_existing_loggers": False,
@@ -7,6 +25,11 @@ LogConfig = {
             'format': '%(asctime)s::%(levelname)s::%(filename)s::%(levelno)s::%(lineno)s::%(message)s',
             'incremental': True,
             'encoding': 'UTF-8',
+        },
+        'json': {
+            # '()': 'LogSettings.JSONFormatter',
+            '()': JSONFormatter,
+            'format': '%(asctime)s::%(levelname)s::%(filename)s::%(levelno)s::%(lineno)s::%(message)s',
         },
     },
     'handlers': {
@@ -25,6 +48,12 @@ LogConfig = {
             "stream": "ext://sys.stderr",
             'formatter': 'details',
         },
+        'json_console': {
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG',
+            "stream": "ext://sys.stderr",
+            'formatter': 'json',
+        },
     },
     'loggers': {
         'root': {
@@ -33,7 +62,7 @@ LogConfig = {
         },
         'consolemode': {
             'level': 'DEBUG',
-            'handlers': ['console'],
+            'handlers': ['json_console'],
         },
         'sqlalchemy.engine': {
             'level': 'DEBUG',
@@ -44,7 +73,7 @@ LogConfig = {
             'handlers': ['console'],
         },
         "uvicorn": {
-            "handlers": ["default"],
+            "handlers": ["console"],
             "level": "INFO",
             "propagate": False
         },
@@ -52,9 +81,21 @@ LogConfig = {
             "level": "INFO"
         },
         "uvicorn.access": {
-            "handlers": ["access"],
+            "handlers": ["console"],
             "level": "INFO",
             "propagate": False
         },
     },
 }
+
+if __name__ == '__main__':
+    import logging.config
+
+    logging.config.dictConfig(LogConfig)
+    logger = logging.getLogger('consolemode')
+
+    logger.debug('hello world')
+    logger.info('hello world')
+    logger.warning('hello world')
+    logger.error('hello world')
+    logger.critical('hello world')
