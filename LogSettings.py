@@ -107,4 +107,9 @@ if __name__ == '__main__':
         logger.error('hello world')
         raise EOFError('EOF!')
     except EOFError as e:
-        logger.critical('hello world', exc_info=True, stack_info=True)
+        logger.critical('hello world', exc_info=True)
+
+    try:
+        raise EOFError('EOF!')
+    except:
+        logger.exception('hello world')
