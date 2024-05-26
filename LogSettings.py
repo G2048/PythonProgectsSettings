@@ -41,5 +41,18 @@ LogConfig = {
             'level': 'DEBUG',
             'handlers': ['console'],
         },
+        "uvicorn": {
+            "handlers": ["default"],
+            "level": "INFO",
+            "propagate": False
+        },
+        "uvicorn.error": {
+            "level": "INFO"
+        },
+        "uvicorn.access": {
+            "handlers": ["access"],
+            "level": "INFO",
+            "propagate": False
+        },
     },
 }
