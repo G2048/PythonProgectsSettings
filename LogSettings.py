@@ -22,6 +22,7 @@ LogConfig = {
         'console': {
             'class': 'logging.StreamHandler',
             'level': 'DEBUG',
+            "stream": "ext://sys.stderr",
             'formatter': 'details',
         },
     },
