@@ -10,6 +10,11 @@ class JSONFormatter(logging.Formatter):
         ready_message: dict = {}
         values = record.__dict__
 
+        if record.exc_info:
+            ready_message['exc_text'] = self.formatException(record.exc_info)
+        if record.stack_info:
+            ready_message['stack'] = self.formatStack(record.stack_info)
+
         for value in self._pattern.findall(self._fmt):
             ready_message.update({value: values.get(value)})
 
@@ -97,5 +102,9 @@ if __name__ == '__main__':
     logger.debug('hello world')
     logger.info('hello world')
     logger.warning('hello world')
-    logger.error('hello world')
-    logger.critical('hello world')
+
+    try:
+        logger.error('hello world')
+        raise EOFError('EOF!')
+    except EOFError as e:
+        logger.critical('hello world', exc_info=True, stack_info=True)
