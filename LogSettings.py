@@ -1,5 +1,6 @@
 LogConfig = {
     'version': 1,
+    "disable_existing_loggers": False,
     'formatters': {
         'details': {
             'class': 'logging.Formatter',
