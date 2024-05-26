@@ -1,5 +1,5 @@
 import json
-import logging
+import logging.config
 import re
 
 
@@ -17,6 +17,7 @@ class JSONFormatter(logging.Formatter):
 
         for value in self._pattern.findall(self._fmt):
             ready_message.update({value: values.get(value)})
+        # ready_message.update({'args': record.args})
 
         return json.dumps(ready_message)
 
@@ -25,8 +26,8 @@ class RouterFilter(logging.Filter):
     endpoints = ('/metrics', '/health')
 
     def filter(self, record) -> bool:
-        record.levelname = record.levelname.upper()
-        return len(record.args) > 2 or record.args[2] not in self.endpoints
+        assert type(record.args) is tuple
+        return not (len(record.args) > 2 and record.args[2] in self.endpoints)
 
 
 LogConfig = {
@@ -47,7 +48,7 @@ LogConfig = {
     },
     'filters': {
         'router': {
-            '()': 'LogSettings.RouterFilter',
+            '()': RouterFilter,
         },
     },
     'handlers': {
@@ -109,11 +110,14 @@ LogConfig = {
     },
 }
 
-if __name__ == '__main__':
-    import logging.config
 
+def get_logger(name=''):
     logging.config.dictConfig(LogConfig)
-    logger = logging.getLogger('consolemode')
+    return logging.getLogger(name)
+
+
+if __name__ == '__main__':
+    logger = get_logger('consolemode')
 
     logger.debug('hello world')
     logger.info('hello world')
@@ -123,7 +127,7 @@ if __name__ == '__main__':
         logger.error('hello world')
         raise EOFError('EOF!')
     except EOFError as e:
-        logger.critical('hello world', exc_info=True)
+        logger.critical('CRITICAL MESSAGE', exc_info=True)
 
     try:
         raise EOFError('EOF!')
