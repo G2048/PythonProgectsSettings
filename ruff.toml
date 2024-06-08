@@ -1,6 +1,13 @@
-extend-select = ["Q"]
 line-length = 120
 indent-width = 4
+
+[lint]
+extend-select = ["Q"]
+ignore = [
+    "F841", # Skip unused variable rules (`F841`).
+    "C901", # too complex
+    "B904", # except clause
+]
 select = [
     "E", # pycodestyle errors
     "W", # pycodestyle warnings
@@ -11,26 +18,16 @@ select = [
     "UP", # pyupgrade
 ]
 
-[lint]
-ignore = [
-    "F841", # Skip unused variable rules (`F841`).
-    "C901", # too complex
-    "B904", # except clause
-]
-
 [format]
 quote-style = "single"
 line-ending = "lf"
 
-[flake8-quotes]
+[lint.flake8-quotes]
 docstring-quotes = "double"
 inline-quotes = "single"
-skip-magic-trailing-comma = false
 
-
-[isort]
-split-on-trailing-comma = true
-combine-as-imports = true
 
 [lint.isort]
+split-on-trailing-comma = true
+combine-as-imports = true
 known-third-party = ["bound"]
