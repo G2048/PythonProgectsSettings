@@ -2,7 +2,10 @@ import json
 import logging.config
 import re
 
+DEBUG = 'DEBUG'
 COUNTER = 0
+LOG_LEVEL = DEBUG or 'INFO'
+SQL_LEVEL = DEBUG or 'WARNING'
 
 
 class JSONFormatter(logging.Formatter):
@@ -103,31 +106,31 @@ LogConfig = {
             'handlers': ['rotate'],
         },
         'consolemode': {
-            'level': 'DEBUG',
+            'level': LOG_LEVEL,
             'handlers': ['json'],
         },
         'sqlalchemy.engine': {
-            'level': 'DEBUG',
+            'level': SQL_LEVEL,
             'handlers': ['console'],
         },
         'sqlalchemy.pool': {
-            'level': 'DEBUG',
+            'level': SQL_LEVEL,
             'handlers': ['console'],
         },
         'uvicorn': {
             'handlers': ['console'],
-            'level': 'INFO',
+            'level': LOG_LEVEL,
             'propagate': False
         },
         'uvicorn.error': {
             'handlers': ['console'],
-            'level': 'INFO',
+            'level': LOG_LEVEL,
             'propagate': False,
 
         },
         'uvicorn.access': {
             'handlers': ['console'],
-            'level': 'INFO',
+            'level': LOG_LEVEL,
             'propagate': False
         },
     },
