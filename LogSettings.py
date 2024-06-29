@@ -103,33 +103,35 @@ LogConfig = {
     'loggers': {
         'root': {
             'level': 'NOTSET',
-            'handlers': ['rotate'],
         },
         'consolemode': {
             'level': LOG_LEVEL,
             'handlers': ['json'],
         },
+        'asyncio': {
+            'level': LOG_LEVEL,
+            'handlers': ['json'],
+        },
         'sqlalchemy.engine': {
             'level': SQL_LEVEL,
-            'handlers': ['console'],
+            'handlers': ['json'],
         },
         'sqlalchemy.pool': {
             'level': SQL_LEVEL,
-            'handlers': ['console'],
+            'handlers': ['json'],
         },
         'uvicorn': {
-            'handlers': ['console'],
+            'handlers': ['json'],
             'level': LOG_LEVEL,
             'propagate': False
         },
         'uvicorn.error': {
-            'handlers': ['console'],
+            'handlers': ['json'],
             'level': LOG_LEVEL,
             'propagate': False,
-
         },
         'uvicorn.access': {
-            'handlers': ['console'],
+            'handlers': ['json'],
             'level': LOG_LEVEL,
             'propagate': False
         },
