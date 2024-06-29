@@ -107,18 +107,22 @@ LogConfig = {
         'consolemode': {
             'level': LOG_LEVEL,
             'handlers': ['json'],
+            'propagate': False
         },
         'asyncio': {
             'level': LOG_LEVEL,
             'handlers': ['json'],
+            'propagate': False
         },
         'sqlalchemy.engine': {
             'level': SQL_LEVEL,
             'handlers': ['json'],
+            'propagate': False
         },
         'sqlalchemy.pool': {
             'level': SQL_LEVEL,
             'handlers': ['json'],
+            'propagate': False
         },
         'uvicorn': {
             'handlers': ['json'],
