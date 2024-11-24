@@ -2,10 +2,18 @@ import json
 import logging.config
 import re
 
-DEBUG = 'DEBUG'
+
 COUNTER = 0
-LOG_LEVEL = DEBUG or 'INFO'
-SQL_LEVEL = DEBUG or 'WARNING'
+DEBUG: bool = False
+LOG_LEVEL = 'INFO'
+SQL_LEVEL = 'WARNING'
+_appname = 'appname'
+_version = '1.0.0'
+
+
+def set_appversion(version: str):
+    global _version
+    _version = version
 
 
 class JSONFormatter(logging.Formatter):
@@ -77,11 +85,11 @@ LogConfig = {
     'handlers': {
         'rotate': {
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'log.log',
+            'filename': f'{_appname}.log',
             'mode': 'w',
             'level': 'DEBUG',
             'maxBytes': 204800,
-            'backupCount': 3,
+            'backupCount': 15,
             'formatter': 'details',
             'filters': ['router'],
         },
@@ -104,41 +112,17 @@ LogConfig = {
         'root': {
             'level': 'NOTSET',
         },
-        'consolemode': {
-            'level': LOG_LEVEL,
-            'handlers': ['json'],
-            'propagate': False
-        },
-        'asyncio': {
-            'level': LOG_LEVEL,
-            'handlers': ['json'],
-            'propagate': False
-        },
-        'sqlalchemy.engine': {
-            'level': SQL_LEVEL,
-            'handlers': ['json'],
-            'propagate': False
-        },
-        'sqlalchemy.pool': {
-            'level': SQL_LEVEL,
-            'handlers': ['json'],
-            'propagate': False
-        },
-        'uvicorn': {
-            'handlers': ['json'],
-            'level': LOG_LEVEL,
-            'propagate': False
-        },
+        'stdout': {'level': LOG_LEVEL, 'handlers': ['json'], 'propagate': False},
+        'asyncio': {'level': LOG_LEVEL, 'handlers': ['json'], 'propagate': False},
+        'sqlalchemy.engine': {'level': SQL_LEVEL, 'handlers': ['json'], 'propagate': False},
+        'sqlalchemy.pool': {'level': SQL_LEVEL, 'handlers': ['json'], 'propagate': False},
+        'uvicorn': {'handlers': ['json'], 'level': LOG_LEVEL, 'propagate': False},
         'uvicorn.error': {
             'handlers': ['json'],
             'level': LOG_LEVEL,
             'propagate': False,
         },
-        'uvicorn.access': {
-            'handlers': ['json'],
-            'level': LOG_LEVEL,
-            'propagate': False
-        },
+        'uvicorn.access': {'handlers': ['json'], 'level': LOG_LEVEL, 'propagate': False},
     },
 }
 
@@ -146,6 +130,19 @@ LogConfig = {
 def get_logger(name=''):
     logging.config.dictConfig(LogConfig)
     return logging.getLogger(name)
+
+
+def set_appname(name: str):
+    LogConfig['handlers']['rotate']['filename'] = f'{name}.log'
+
+
+def set_debug_level(debug: bool):
+    if debug:
+        LogConfig['loggers']['stdout']['level'] = 'DEBUG'
+        LogConfig['loggers']['logfile']['level'] = 'DEBUG'
+        LogConfig['loggers']['asyncio']['level'] = 'DEBUG'
+        LogConfig['loggers']['sqlalchemy.engine']['level'] = 'DEBUG'
+        LogConfig['loggers']['sqlalchemy.pool']['level'] = 'DEBUG'
 
 
 if __name__ == '__main__':
