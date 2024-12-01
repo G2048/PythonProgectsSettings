@@ -191,5 +191,5 @@ if __name__ == '__main__':
 
     try:
         raise EOFError('EOF!')
-    except:
+    except Exception:
         logger.exception('hello world')
