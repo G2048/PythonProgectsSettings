@@ -2,6 +2,37 @@ import json
 import logging.config
 import re
 
+"""
+Description: Log settings
+Example of usage:
+
+# Add in main.py
+>>> from app.configs import (
+    get_appsettings,
+    get_database_settings,
+    get_logger,
+)
+
+>>> set_appname(get_appsettings().APP_NAME)
+>>> set_appversion(get_appsettings().APP_VERSION)
+>>> set_debug_level(get_appsettings().DEBUG)
+
+# In another module:
+>>> import logging
+>>> logger = logging.getLogger("stdout")
+>>> logger.debug("hello world")
+>>> logger.info("hello world")
+>>> logger.warning("hello world")
+
+
+# If you are using the uvicorn:
+>>> from log_config import LogConfig
+...
+>>> if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, log_config=LogConfig)
+
+"""
+
 
 COUNTER = 0
 DEBUG: bool = False
