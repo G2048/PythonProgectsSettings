@@ -148,11 +148,7 @@ LogConfig = {
         'sqlalchemy.engine': {'level': SQL_LEVEL, 'handlers': ['json'], 'propagate': False},
         'sqlalchemy.pool': {'level': SQL_LEVEL, 'handlers': ['json'], 'propagate': False},
         'uvicorn': {'handlers': ['json'], 'level': LOG_LEVEL, 'propagate': False},
-        'uvicorn.error': {
-            'handlers': ['json'],
-            'level': LOG_LEVEL,
-            'propagate': False,
-        },
+        'uvicorn.error': {'handlers': ['json'], 'level': LOG_LEVEL, 'propagate': False},
         'uvicorn.access': {'handlers': ['json'], 'level': LOG_LEVEL, 'propagate': False},
     },
 }
@@ -169,11 +165,8 @@ def set_appname(name: str):
 
 def set_debug_level(debug: bool):
     if debug:
-        LogConfig['loggers']['stdout']['level'] = 'DEBUG'
-        LogConfig['loggers']['logfile']['level'] = 'DEBUG'
-        LogConfig['loggers']['asyncio']['level'] = 'DEBUG'
-        LogConfig['loggers']['sqlalchemy.engine']['level'] = 'DEBUG'
-        LogConfig['loggers']['sqlalchemy.pool']['level'] = 'DEBUG'
+        for logger in LogConfig['loggers'].keys():
+            logger['level'] = 'DEBUG'
 
 
 if __name__ == '__main__':
