@@ -81,7 +81,7 @@ class JSONFormatter(logging.Formatter):
             ready_message['http_version'] = record.args[3]
             ready_message['status'] = record.args[4]
 
-        return json.dumps(ready_message)
+        return json.dumps(ready_message, ensure_ascii=False)
 
 
 class RouterFilter(logging.Filter):
