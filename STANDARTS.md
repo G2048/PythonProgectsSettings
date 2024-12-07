@@ -253,6 +253,8 @@ buf_users = {}
 for user in users:
 	buf_users[user["topic_uuid"]] = user
 
+# Мы получаем данные, о пользователях 
+# которые содержатся в полученных топиках кафки
 list_users_topics = []
 for topic in kafka_topics:
 	list_users_topics.append(buf_users[topic["uuid"]])
