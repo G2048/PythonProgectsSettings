@@ -143,13 +143,41 @@ LogConfig = {
         'root': {
             'level': 'NOTSET',
         },
-        'stdout': {'level': LOG_LEVEL, 'handlers': ['json'], 'propagate': False},
-        'asyncio': {'level': LOG_LEVEL, 'handlers': ['json'], 'propagate': False},
-        'sqlalchemy.engine': {'level': SQL_LEVEL, 'handlers': ['json'], 'propagate': False},
-        'sqlalchemy.pool': {'level': SQL_LEVEL, 'handlers': ['json'], 'propagate': False},
-        'uvicorn': {'handlers': ['json'], 'level': LOG_LEVEL, 'propagate': False},
-        'uvicorn.error': {'handlers': ['json'], 'level': LOG_LEVEL, 'propagate': False},
-        'uvicorn.access': {'handlers': ['json'], 'level': LOG_LEVEL, 'propagate': False},
+        'stdout': {
+            'level': LOG_LEVEL,
+            'handlers': ['json'],
+            'propagate': False,
+        },
+        'asyncio': {
+            'level': LOG_LEVEL,
+            'handlers': ['json'],
+            'propagate': False,
+        },
+        'sqlalchemy.engine': {
+            'level': SQL_LEVEL,
+            'handlers': ['json'],
+            'propagate': False,
+        },
+        'sqlalchemy.pool': {
+            'level': SQL_LEVEL,
+            'handlers': ['json'],
+            'propagate': False,
+        },
+        'uvicorn': {
+            'handlers': ['json'],
+            'level': LOG_LEVEL,
+            'propagate': False,
+        },
+        'uvicorn.error': {
+            'handlers': ['json'],
+            'level': LOG_LEVEL,
+            'propagate': False,
+        },
+        'uvicorn.access': {
+            'handlers': ['json'],
+            'level': LOG_LEVEL,
+            'propagate': False,
+        },
     },
 }
 
