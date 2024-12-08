@@ -6,33 +6,39 @@ ruff = "^0.1.11"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.ruff]
-extend-select = ["Q"]
+[tool.ruff.lint]
+extend-select = ["Q", "I"]
 format.quote-style="single"
+ignore-init-module-imports = true
 line-length = 88
 indent-width = 4
 select = [
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "F",  # pyflakes
-    "C",  # flake8-comprehensions
-    "I",  # isort
-    "B",  # flake8-bugbear
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "C",   # flake8-comprehensions
+    "I",   # isort
+    "B",   # flake8-bugbear
     "UP",  # pyupgrade
+    "RUF", # Ruff-specific rules
 ]
 
 ignore = [
-    "C901",  # too complex
-    "B904",  # except clause
+    "C901",  # Too complex
+    "B904",  # Except clause
 ]
 
 [tool.ruff.flake8-quotes]
 docstring-quotes = "double"
 inline-quotes = "single"
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 split-on-trailing-comma=true
 combine-as-imports=true
-
-[tool.ruff.lint.isort]
 known-third-party = ["bound"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "PLC0414"]
+"examples/**" = ["N805", "N999", "RUF012"]
+"tests/**" = ["RUF012", "SIM115"]
+
