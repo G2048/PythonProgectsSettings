@@ -1,14 +1,17 @@
 import time
 
 from fastapi import FastAPI, Request
-from fastapi import FastAPI
+from fastapi.middleware.wsgi import WSGIMiddleware
 from starlette.middleware.cors import CORSMiddleware
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 
 from app.configs import LogConfig, get_logger
 from app.api import v1
 
 
 app = FastAPI()
+sub_app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
@@ -32,6 +35,26 @@ async def add_process_time_header(request: Request, call_next):
     response.headers['X-Process-Time'] = str(process_time)
     request.state.logger.info(f'{process_time=}')
     return response
+
+
+templates = Jinja2Templates(directory='app/templates')
+
+
+@sub_app.get('/static/{path}', response_class=HTMLResponse)
+def static_files(path: str):
+    return templates.TemplateResponse(
+        'index.html',
+        {
+            'request': path,
+            'title': 'Demo',
+            'body_content': 'This is the demo for using FastAPI with Jinja templates',
+        },
+    )
+
+
+# Add another the single webserver
+# by default return 307 Temporary Redirect
+app.mount('/static', WSGIMiddleware(sub_app), name='static')
 
 
 app.include_router(v1.auth, prefix='/api/v1')
