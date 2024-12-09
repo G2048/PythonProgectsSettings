@@ -1,5 +1,6 @@
 import time
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.wsgi import WSGIMiddleware
 from starlette.middleware.cors import CORSMiddleware
@@ -10,7 +11,25 @@ from app.configs import LogConfig, get_logger
 from app.api import v1
 
 
-app = FastAPI()
+def fake_answer_to_everything_ml_model(x: float):
+    return x * 42
+
+
+ml_models = {}
+
+
+# For more description see: https://asgi.readthedocs.io/en/latest/specs/lifespan.html
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Load the ML model
+    ml_models['answer_to_everything'] = fake_answer_to_everything_ml_model
+    yield
+    # Clean up the ML models and release the resources
+    ml_models.clear()
+
+
+# Custom Docs: https://fastapi.tiangolo.com/how-to/custom-docs-ui-assets/
+app = FastAPI(lifespan=lifespan)
 sub_app = FastAPI()
 
 app.add_middleware(
@@ -35,6 +54,12 @@ async def add_process_time_header(request: Request, call_next):
     response.headers['X-Process-Time'] = str(process_time)
     request.state.logger.info(f'{process_time=}')
     return response
+
+
+@app.get('/predict')
+async def predict(x: float):
+    result = ml_models['answer_to_everything'](x)
+    return {'result': result}
 
 
 templates = Jinja2Templates(directory='app/templates')
