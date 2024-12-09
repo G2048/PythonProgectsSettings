@@ -1,7 +1,8 @@
 import time
 
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, BackgroundTasks
+from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.wsgi import WSGIMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
@@ -60,6 +61,19 @@ async def add_process_time_header(request: Request, call_next):
 async def predict(x: float):
     result = ml_models['answer_to_everything'](x)
     return {'result': result}
+
+
+# If task is defined as async and inside the sync code, you must use the run_in_threadpool
+def write_notification(email: str, message=''):
+    with open('log.txt', mode='w') as email_file:
+        content = f'notification for {email}: {message}'
+        email_file.write(content)
+
+
+@app.post('/send-notification/{email}')
+async def send_notification(email: str, background_tasks: BackgroundTasks):
+    background_tasks.add_task(write_notification, email, message='some notification')
+    return {'message': 'Notification sent in the background'}
 
 
 templates = Jinja2Templates(directory='app/templates')
