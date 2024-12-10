@@ -39,13 +39,13 @@ class DataBase:
         finally:
             await self.close()
 
-    async def execute(self, sql) -> None:
+    async def execute(self, sql, *args) -> None:
         if not self._connection:
             raise RuntimeError('You must use the .connect() first')
-        await self._engine.execute(self._connection, sql)
+        await self._engine.execute(self._connection, sql, *args)
 
-    async def fetchall(self, sql: str) -> list:
-        return await self._engine.fetchall(self._connection, sql)
+    async def fetchall(self, sql: str, *args) -> list:
+        return await self._engine.fetchall(self._connection, sql, *args)
 
     @property
     def columns(self):

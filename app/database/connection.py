@@ -70,11 +70,11 @@ class PsycopgAsyncConnection(AsyncConnection):
             **conn_args,
         )
 
-    async def execute(self, connection, sql):
-        await connection.execute(sql)
+    async def execute(self, connection, sql, *args):
+        await connection.execute(sql, args)
 
-    async def fetchall(self, connection, sql):
-        self._cursor = await connection.execute(sql)
+    async def fetchall(self, connection, sql, *args):
+        self._cursor = await connection.execute(sql, args)
         return await self._cursor.fetchall()
 
     @property
