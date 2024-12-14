@@ -182,7 +182,7 @@ LogConfig = {
 }
 
 
-def get_logger(name=''):
+def get_logger(name='stdout'):
     logging.config.dictConfig(LogConfig)
     return logging.getLogger(name)
 
@@ -198,7 +198,7 @@ def set_debug_level(debug: bool):
 
 
 if __name__ == '__main__':
-    logger = get_logger('consolemode')
+    logger = get_logger()
 
     logger.debug('hello world')
     logger.info('hello world')
