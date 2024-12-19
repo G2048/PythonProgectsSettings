@@ -34,7 +34,6 @@ Example of usage:
 """
 
 
-COUNTER = 0
 DEBUG: bool = False
 LOG_LEVEL = 'INFO'
 SQL_LEVEL = 'WARNING'
@@ -49,20 +48,20 @@ def set_appversion(version: str):
 
 class JSONFormatter(logging.Formatter):
     _pattern = re.compile(r'%\((\w+)\)s')
+    COUNTER = 0
 
     def formatMessage(self, record) -> str:
-        global COUNTER
         ready_message: dict = {}
         values = record.__dict__
 
-        COUNTER += 1
+        self.COUNTER += 1
         logger_name: str = values['name']
         ready_message['app.name'] = 'appname'.lower()
         ready_message['app.version'] = '1.0.0'
         ready_message['app.logger'] = logger_name
         ready_message['time'] = self.formatTime(record, self.datefmt)
         ready_message['level'] = values.get('levelname')
-        ready_message['log_id']: int = COUNTER
+        ready_message['log_id']: int = self.COUNTER
 
         if record.exc_info:
             ready_message['exc_text'] = self.formatException(record.exc_info)
