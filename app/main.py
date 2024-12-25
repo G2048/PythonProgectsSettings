@@ -1,15 +1,14 @@
 import time
-
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request, BackgroundTasks
-from fastapi.concurrency import run_in_threadpool
-from fastapi.middleware.wsgi import WSGIMiddleware
-from starlette.middleware.cors import CORSMiddleware
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
 
-from app.configs import LogConfig, get_logger
+from fastapi import BackgroundTasks, FastAPI, Request
+from fastapi.middleware.wsgi import WSGIMiddleware
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from starlette.middleware.cors import CORSMiddleware
+
 from app.api import v1
+from app.configs import LogConfig, get_logger
 
 
 def fake_answer_to_everything_ml_model(x: float):
