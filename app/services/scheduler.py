@@ -20,7 +20,8 @@ class Job(ABC):
     async def run(self):
         pass
 
-
+# For more best way scheduling:
+# https://github.com/dbader/schedule/tree/master
 class Scheduler:
     def __init__(self, hour: int, minute: int, time_frequency: Time, job: Job) -> None:
         # self.definer = definer
