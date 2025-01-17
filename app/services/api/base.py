@@ -6,12 +6,14 @@ from httpx import AsyncClient
 
 from app.configs import get_logger
 
-logger = get_logger()
+from .exceptions import HTTPException
 
 Json: TypeAlias = str
 
 
 class BaseApi:
+    logger = get_logger()
+
     def __init__(self, url):
         self.HEADERS = {'Content-Type': 'application/json'}
         self.URL = url
@@ -26,7 +28,7 @@ class BaseApi:
 
     async def _request(self, url, query_params=None, method='GET', **kwargs):
         self.URL += url
-        logger.debug(f'{url}, {query_params=}, {self.HEADERS=}')
+        self.logger.debug(f'{url}, {query_params=}, {self.HEADERS=}')
 
         async with AsyncClient(follow_redirects=True) as client:
             self._response = await client.request(
@@ -34,9 +36,11 @@ class BaseApi:
             )
 
             self.status_code = self._response.status_code
-            logger.debug(self._response.status_code)
-            logger.debug(self._response.text)
+            self.logger.debug(self._response.status_code)
+            self.logger.debug(self._response.text)
 
+            if self._response.status_code >= 500:
+                raise HTTPException(self._response.status_code, self._response.text)
             if self._response.status_code < 300:
                 response_json = self._validateJson(self._response.json)
                 if response_json:
