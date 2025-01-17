@@ -41,10 +41,13 @@ class BaseApi:
 
             if self._response.status_code >= 500:
                 raise HTTPException(self._response.status_code, self._response.text)
+
             if self._response.status_code < 300:
                 response_json = self._validateJson(self._response.json)
                 if response_json:
                     return response_json
+
+            return {'text': self._response.text}
 
     @property
     def status_code(self) -> int | None:
