@@ -26,13 +26,16 @@ class BaseApi:
         except JSONDecodeError:
             return None
 
+    def _concat_url(self, url: str) -> str:
+        return self.URL + url
+
     async def _request(self, url, query_params=None, method='GET', **kwargs):
-        self.URL += url
+        url = _concat_url(url)
         self.logger.debug(f'{url}, {query_params=}, {self.HEADERS=}')
 
         async with AsyncClient(follow_redirects=True) as client:
             self._response = await client.request(
-                method=method, url=self.URL, params=query_params, headers=self.HEADERS, **kwargs
+                method=method, url=url, params=query_params, headers=self.HEADERS, **kwargs
             )
 
             self.status_code = self._response.status_code
