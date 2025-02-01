@@ -89,10 +89,9 @@ class RouterFilter(logging.Filter):
     endpoints = ('/metrics', '/health')
 
     def filter(self, record) -> bool:
-        if record.args is not None:
-            assert type(record.args) is tuple
-            return not (len(record.args) > 2 and record.args[2] in self.endpoints)
-        return True
+        return record.args is None or (
+            not len(record.args) > 2 and record.args[2] in self.endpoints
+        )
 
 
 class AutoStartQueueListener(logging.handlers.QueueListener):
