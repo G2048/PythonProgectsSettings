@@ -1,5 +1,7 @@
 import json
 import logging.config
+import logging.handlers
+import queue
 import re
 
 """
@@ -87,8 +89,17 @@ class RouterFilter(logging.Filter):
     endpoints = ('/metrics', '/health')
 
     def filter(self, record) -> bool:
-        assert type(record.args) is tuple
-        return not (len(record.args) > 2 and record.args[2] in self.endpoints)
+        if record.args is not None:
+            assert type(record.args) is tuple
+            return not (len(record.args) > 2 and record.args[2] in self.endpoints)
+        return True
+
+
+class AutoStartQueueListener(logging.handlers.QueueListener):
+    def __init__(self, queue, *handlers, respect_handler_level=False):
+        super().__init__(queue, *handlers, respect_handler_level=respect_handler_level)
+        # Start the listener immediately.
+        self.start()
 
 
 LogConfig = {
@@ -137,6 +148,17 @@ LogConfig = {
             'formatter': 'json',
             'filters': ['router'],
         },
+        'jqueue': {
+            'class': 'logging.handlers.QueueHandler',
+            'queue': {
+                '()': queue.Queue,
+                'maxsize': -1,
+            },
+            'level': 'DEBUG',
+            'listener': AutoStartQueueListener,
+            'handlers': ['json'],
+            # 'handlers': ['cfg://handlers.json', 'cfg://handlers.console'],
+        },
     },
     'loggers': {
         'root': {
@@ -144,36 +166,36 @@ LogConfig = {
         },
         'stdout': {
             'level': LOG_LEVEL,
-            'handlers': ['json'],
+            'handlers': ['jqueue'],
             'propagate': False,
         },
         'asyncio': {
             'level': LOG_LEVEL,
-            'handlers': ['json'],
+            'handlers': ['jqueue'],
             'propagate': False,
         },
         'sqlalchemy.engine': {
             'level': SQL_LEVEL,
-            'handlers': ['json'],
+            'handlers': ['jqueue'],
             'propagate': False,
         },
         'sqlalchemy.pool': {
             'level': SQL_LEVEL,
-            'handlers': ['json'],
+            'handlers': ['jqueue'],
             'propagate': False,
         },
         'uvicorn': {
-            'handlers': ['json'],
+            'handlers': ['jqueue'],
             'level': LOG_LEVEL,
             'propagate': False,
         },
         'uvicorn.error': {
-            'handlers': ['json'],
+            'handlers': ['jqueue'],
             'level': LOG_LEVEL,
             'propagate': False,
         },
         'uvicorn.access': {
-            'handlers': ['json'],
+            'handlers': ['jqueue'],
             'level': LOG_LEVEL,
             'propagate': False,
         },
@@ -198,6 +220,7 @@ def set_debug_level(debug: bool):
 
 if __name__ == '__main__':
     logger = get_logger()
+    logger.setLevel(logging.DEBUG)
 
     logger.debug('hello world')
     logger.info('hello world')
