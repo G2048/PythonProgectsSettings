@@ -28,27 +28,37 @@ class BaseApi:
 
     def _concat_url(self, url: str) -> str:
         return self.URL + url
+        # return urljoin(self.URL, url)
 
-    async def _request(self, url: str, query_params=None, method='GET', **kwargs):
+    async def _request(self, url, query_params=None, method='GET', **kwargs) -> dict:
         url = self._concat_url(url)
         self.logger.debug(f'{url}, {query_params=}, {self.HEADERS=}')
 
-        async with AsyncClient(follow_redirects=True) as client:
-            self._response = await client.request(
-                method=method, url=url, params=query_params, headers=self.HEADERS, **kwargs
-            )
-
+        try:
+            async with AsyncClient(follow_redirects=True) as client:
+                self._response = await client.request(
+                    method=method,
+                    url=url,
+                    params=query_params,
+                    headers=self.HEADERS,
+                    **kwargs,
+                )
+        except Exception as e:
+            self.logger.error(f'Error while request: {e=}')
+            raise e
+        finally:
             self.status_code = self._response.status_code
-            self.logger.debug(self._response.status_code)
+            self.logger.debug(self.status_code)
             self.logger.debug(self._response.text)
+            self.HEADERS = {'Content-Type': 'application/json'}
 
-            if self._response.status_code < 300:
-                response_json = self._validateJson(self._response.json)
-                if response_json:
-                    return response_json
-                return {'text': self._response.text}
-            else:
-                raise HTTPException(self._response.status_code, self._response.text)
+        if self._response.status_code < 300:
+            response_json = self._validateJson(self._response.json)
+            if response_json:
+                return response_json
+            return {'text': self._response.text}
+        else:
+            raise HTTPException(self._response.status_code, self._response.text)
 
     @property
     def status_code(self) -> int:
