@@ -69,5 +69,9 @@ class BaseApi:
         self._status_code = value
 
     @staticmethod
+    def dump(data: dict) -> Json | str:
+        return json.dumps(data)
+
+    @staticmethod
     def serialize(data: Json) -> dict[Any, Any]:
         return json.loads(data)
