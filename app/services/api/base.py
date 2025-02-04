@@ -47,11 +47,11 @@ class BaseApi:
             self.logger.error(f'Error while request: {e=}')
             raise e
         finally:
-            self.status_code = self._response.status_code
-            self.logger.debug(self.status_code)
-            self.logger.debug(self._response.text)
             self.HEADERS = {'Content-Type': 'application/json'}
 
+        self.status_code = self._response.status_code
+        self.logger.debug(self.status_code)
+        self.logger.debug(self._response.text)
         if self._response.status_code < 300:
             response_json = self._validateJson(self._response.json)
             if response_json:
