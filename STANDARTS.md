@@ -83,14 +83,14 @@ poetry install
 
 ### Вывести список имеющихся команд
 ```zsh
-poetry list 
+poetry list
 ```
 
 ### Ruff
 ### Правила линтинга
 
 В `pyproject.toml` добавить:
-```toml
+```python
 [tool.ruff.lint]
 line-length = 120
 indent-width = 4
@@ -222,9 +222,9 @@ for secret in secrets:
 - Описывать очевидную вещь
 ```python
 # увеличение счетчика обработанных данных
-count = count + 1 
+count = count + 1
 ```
-- Быть разделителем 
+- Быть разделителем
 ```python
 def processings_message(message:):
 	...
@@ -247,13 +247,13 @@ result = kafka.api(address_kafka).sending(data)
 ```
 
 ```python
-# Данный код нужен для уменьшения 
+# Данный код нужен для уменьшения
 # временной сложности с O(n^2) к O(n)
 buf_users = {}
 for user in users:
 	buf_users[user["topic_uuid"]] = user
 
-# Мы получаем данные, о пользователях 
+# Мы получаем данные, о пользователях
 # которые содержатся в полученных топиках кафки
 list_users_topics = []
 for topic in kafka_topics:
@@ -290,7 +290,6 @@ for topic in kafka_topics:
 └── pyproject.toml
 ```
 
-
 # GIT
 
 ## Коммиты
@@ -300,14 +299,50 @@ https://www.conventionalcommits.org/ru/v1.0.0/
 Angular Convention:
 https://github.com/angular/angular/blob/main/CONTRIBUTING.md#commit
 > На нем основан git commit convention
+>
 > Он нужен для уточнения/расширения таких моментов как scope и type
 
 ## Семантическое версионирование - Стандарт!
 Правила версионирования пакетов/программ:
 https://semver.org/lang/ru/
 
+## Commitizen
+[Commitizen](https://commitizen-tools.github.io/commitizen/) нужен для упрощения работы с коммитами по *Semantic Versioning* (semver).
+Плюсы:
+- Упрощает работу с коммитами
+- Коммиты в стиле semver
+- Позволяет упростить работу с git flow
+- Создание CHANGELOG из коммитов
+- Простое увеличение версии (bump) проекта на основе коммитов
 
-# Дополнительно 
+### Установка
+```zsh
+poetry add commitizen --group dev
+```
+> Лучше ставить сразу в общий scope, не привязываясь к конкретному проекту
+
+### Начало работы
+```zsh
+cz init
+```
+
+### Создание коммита
+```zsh
+cz commit
+```
+
+### Увеличение версии
+```zsh
+cz bump
+```
+
+### Создание CHANGELOG
+```zsh
+cz changelog
+```
+
+
+# Дополнительно
 
 ## PEP20
 Прочитать:
@@ -316,5 +351,3 @@ https://semver.org/lang/ru/
 import this
 ```
 > Читать!
-
-
