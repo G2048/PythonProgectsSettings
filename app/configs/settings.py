@@ -1,22 +1,25 @@
 from typing import Optional
 
 from dotenv import load_dotenv
-from pydantic import computed_field, field_validator
+from pydantic import computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from .log_settings import set_appname, set_appversion, set_debug_level
+from .pyproject import ParserPyproject
+
 
 load_dotenv()
+pyproject_parser = ParserPyproject()
 
 
 class AppSettings(BaseSettings):
-    appname: str = 'reviewBI'
-    appversion: str = '0.0.1'
+    appname: str = ParserPyproject.name
+    appversion: str = ParserPyproject.version
     debug: bool = False
 
-    @field_validator('appname')
-    def appname_is_lower(cls, value):
-        return value.lower()
+    @computed_field(return_type=str)
+    def appname_log(self) -> str:
+        return self.appname.lower().replace(' ', '_')
 
 
 class DataBaseSettings(BaseSettings):
@@ -37,7 +40,7 @@ class DataBaseSettings(BaseSettings):
 _app_settings = AppSettings()
 
 set_debug_level(_app_settings.debug)
-set_appname(_app_settings.appname)
+set_appname(_app_settings.appname_log)
 set_appversion(_app_settings.appversion)
 
 
