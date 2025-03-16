@@ -3,6 +3,8 @@ import logging.config
 import logging.handlers
 import queue
 import re
+import traceback
+import inspect
 
 """
 Description: Log settings
@@ -53,17 +55,20 @@ class JSONFormatter(logging.Formatter):
     COUNTER = 0
 
     def formatMessage(self, record) -> str:
+        global _appname
+        global _version
         ready_message: dict = {}
         values = record.__dict__
 
         self.COUNTER += 1
         logger_name: str = values['name']
-        ready_message['app.name'] = 'appname'.lower()
-        ready_message['app.version'] = '1.0.0'
+        ready_message['app.name'] = _appname
+        ready_message['app.version'] = _version
         ready_message['app.logger'] = logger_name
         ready_message['time'] = self.formatTime(record, self.datefmt)
         ready_message['level'] = values.get('levelname')
         ready_message['log_id']: int = self.COUNTER
+        ready_message['message'] = str(values['message'])
 
         if record.exc_info:
             ready_message['exc_text'] = self.formatException(record.exc_info)
@@ -74,7 +79,7 @@ class JSONFormatter(logging.Formatter):
             value = values.get(value_name)
             ready_message.update({value_name: value})
 
-        if logger_name.startswith('uvicorn') and len(record.args) == 5:
+        if logger_name.startswith('uvicorn') and record.args and len(record.args) == 5:
             ready_message.pop('message', None)
             ready_message['client_addr'] = record.args[0]
             ready_message['method'] = record.args[1]
@@ -208,6 +213,8 @@ def get_logger(name='stdout'):
 
 
 def set_appname(name: str):
+    global _appname
+    _appname = name
     LogConfig['handlers']['rotate']['filename'] = f'{name}.log'
 
 
