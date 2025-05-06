@@ -168,6 +168,11 @@ LogConfig = {
         'root': {
             'level': 'NOTSET',
         },
+        'app': {
+            'level': LOG_LEVEL,
+            'handlers': ['jqueue'],
+            'propagate': False,
+        },
         'stdout': {
             'level': LOG_LEVEL,
             'handlers': ['jqueue'],
