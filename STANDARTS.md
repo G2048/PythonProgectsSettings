@@ -341,6 +341,41 @@ cz bump
 cz changelog
 ```
 
+## Git Flow
+
+### Ветки
+- master
+- develop
+- release
+- hotfix
+
+### Команды
+- git flow init
+- git flow feature start <feature_name>
+- git flow feature finish <feature_name>
+- git flow release start <release_name>
+- git flow release finish <release_name>
+- git flow hotfix start <hotfix_name>
+- git flow hotfix finish <hotfix_name>
+
+### Дополнительная литература
+- https://ru.hexlet.io/blog/posts/git-commit-message#sem-pravil-horoshego-opisaniya-kommita
+
+
+## CI
+
+### GitHub Actions
+https://github.com/features/actions
+
+### GitLab CI
+https://docs.gitlab.com/ee/ci/
+
+### GitLab Runner
+https://docs.gitlab.com/runner/
+
+### CircleCI
+https://circleci.com/docs/
+
 
 # Дополнительно
 
