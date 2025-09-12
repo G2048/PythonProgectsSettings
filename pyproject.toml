@@ -6,12 +6,15 @@ ruff = "^0.1.11"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.ruff.lint]
-extend-select = ["Q", "I"]
-format.quote-style="single"
-ignore-init-module-imports = true
-line-length = 88
+[tool.ruff]
+format.quote-style="double"
 indent-width = 4
+line-length = 88
+
+
+[tool.ruff.lint]
+ignore-init-module-imports = true
+extend-select = ["Q", "I"]
 select = [
     "E",   # pycodestyle errors
     "W",   # pycodestyle warnings
@@ -28,9 +31,9 @@ ignore = [
     "B904",  # Except clause
 ]
 
-[tool.ruff.flake8-quotes]
+[tool.ruff.lint.flake8-quotes]
 docstring-quotes = "double"
-inline-quotes = "single"
+inline-quotes = "double"
 
 [tool.ruff.lint.isort]
 split-on-trailing-comma=true
