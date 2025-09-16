@@ -225,7 +225,7 @@ def set_appname(name: str):
 
 def set_debug_level(debug: bool):
     if debug:
-        for logger in LogConfig['loggers'].keys():
+        for logger in LogConfig['loggers'].values():
             logger['level'] = 'DEBUG'
 
 
