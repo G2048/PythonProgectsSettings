@@ -3,8 +3,9 @@ import logging.config
 import logging.handlers
 import queue
 import re
-import traceback
-import inspect
+import uuid
+from contextvars import ContextVar
+from logging import Logger
 
 """
 Description: Log settings
@@ -53,6 +54,7 @@ def set_appversion(version: str):
 class JSONFormatter(logging.Formatter):
     _pattern = re.compile(r'%\((\w+)\)s')
     COUNTER = 0
+    _req_id = ContextVar('req_id', default=uuid.uuid4().hex[:10])
 
     def formatMessage(self, record) -> str:
         global _appname
@@ -69,6 +71,9 @@ class JSONFormatter(logging.Formatter):
         ready_message['level'] = values.get('levelname')
         ready_message['log_id']: int = self.COUNTER
         ready_message['message'] = str(values['message'])
+
+        if not values.get('req_id'):
+            values['req_id'] = self._req_id.get()
 
         if record.exc_info:
             ready_message['exc_text'] = self.formatException(record.exc_info)
@@ -106,25 +111,41 @@ class AutoStartQueueListener(logging.handlers.QueueListener):
         self.start()
 
 
+class RequestIdFilter(logging.Filter):
+    def __init__(self, name=''):
+        self.req_id = ContextVar('req_id', default=None)
+        super().__init__(name)
+
+    def filter(self, record):
+        if not self.req_id.get():
+            self.req_id.set(uuid.uuid4().hex[:10])
+        record.req_id = self.req_id.get()
+        return True
+
+
 LogConfig = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
         'details': {
             'class': 'logging.Formatter',
-            'format': '%(asctime)s::%(levelname)s::%(filename)s::%(levelno)s::%(lineno)s::%(message)s',
+            'format': '%(asctime)s::%(levelname)s::%(filename)s::%(levelno)s::%(lineno)s::%(message)s',  # noqa: E501
             'incremental': True,
             'encoding': 'UTF-8',
         },
         'json': {
             # '()': 'LogSettings.JSONFormatter',
             '()': JSONFormatter,
-            'format': '%(filename)s::%(lineno)s::%(message)s',
+            'format': '%(process)d::%(filename)s::%(lineno)s::%(message)s::%(req_id)s',
+            # "format": "%(process)d::%(filename)s::%(lineno)s::%(message)s",
         },
     },
     'filters': {
         'router': {
             '()': RouterFilter,
+        },
+        'req_id': {
+            '()': RequestIdFilter,
         },
     },
     'handlers': {
@@ -152,7 +173,7 @@ LogConfig = {
             'formatter': 'json',
             'filters': ['router'],
         },
-        'jqueue': {
+        'jsonq': {
             'class': 'logging.handlers.QueueHandler',
             'queue': {
                 '()': queue.Queue,
@@ -161,60 +182,97 @@ LogConfig = {
             'level': 'DEBUG',
             'listener': AutoStartQueueListener,
             'handlers': ['json'],
-            # 'handlers': ['cfg://handlers.json', 'cfg://handlers.console'],
         },
+        # 'handlers': ['cfg://handlers.json', 'cfg://handlers.console'],
     },
     'loggers': {
-        'root': {
-            'level': 'NOTSET',
-        },
-        'app': {
+        '': {
             'level': LOG_LEVEL,
-            'handlers': ['jqueue'],
+            'handlers': ['jsonq'],
             'propagate': False,
         },
         'stdout': {
             'level': LOG_LEVEL,
-            'handlers': ['jqueue'],
+            'handlers': ['jsonq'],
+            'propagate': False,
+        },
+        'app': {
+            'level': LOG_LEVEL,
+            'handlers': ['jsonq'],
+            'propagate': False,
+        },
+        'worker': {
+            'level': LOG_LEVEL,
+            'handlers': ['jsonq'],
+            'propagate': False,
+        },
+        'faststream': {
+            'level': LOG_LEVEL,
+            'handlers': ['jsonq'],
+            'propagate': False,
+        },
+        'faststream.access': {
+            'level': LOG_LEVEL,
+            'handlers': ['jsonq'],
+            'propagate': False,
+        },
+        'faststream.access.rabbit': {
+            'level': LOG_LEVEL,
+            'handlers': ['jsonq'],
             'propagate': False,
         },
         'asyncio': {
             'level': LOG_LEVEL,
-            'handlers': ['jqueue'],
+            'handlers': ['jsonq'],
             'propagate': False,
         },
-        'sqlalchemy.engine': {
-            'level': SQL_LEVEL,
-            'handlers': ['jqueue'],
-            'propagate': False,
-        },
-        'sqlalchemy.pool': {
-            'level': SQL_LEVEL,
-            'handlers': ['jqueue'],
-            'propagate': False,
-        },
+        # "logfile": {"level": LOG_LEVEL, "handlers": ["rotate"], "propagate": False},
         'uvicorn': {
-            'handlers': ['jqueue'],
+            'handlers': ['jsonq'],
             'level': LOG_LEVEL,
             'propagate': False,
         },
         'uvicorn.error': {
-            'handlers': ['jqueue'],
+            # DISABLE logger  because something redefine log level to debug... it's too verbose
+            'handlers': ['jsonq'],
             'level': LOG_LEVEL,
             'propagate': False,
         },
         'uvicorn.access': {
-            'handlers': ['jqueue'],
+            'handlers': ['jsonq'],
             'level': LOG_LEVEL,
+            'propagate': False,
+        },
+        'sqlalchemy.engine': {
+            'level': SQL_LEVEL,
+            'handlers': ['jsonq'],
+            'propagate': False,
+        },
+        'sqlalchemy.pool': {
+            'level': SQL_LEVEL,
+            'handlers': ['jsonq'],
+            'propagate': False,
+        },
+        'httpx': {
+            'level': 'WARNING',
+            'handlers': ['jsonq'],
             'propagate': False,
         },
     },
 }
 
 
-def get_logger(name='stdout'):
+class CustomLogger(Logger):
+    def refresh_req_id(self):
+        self.filters = []
+        self.addFilter(RequestIdFilter())
+
+
+def get_logger(name='app') -> CustomLogger:
+    logging.setLoggerClass(CustomLogger)
     logging.config.dictConfig(LogConfig)
-    return logging.getLogger(name)
+    logger: CustomLogger = logging.getLogger(name)
+    return logger
 
 
 def set_appname(name: str):
@@ -231,11 +289,25 @@ def set_debug_level(debug: bool):
 
 if __name__ == '__main__':
     logger = get_logger()
-    logger.setLevel(logging.DEBUG)
 
     logger.debug('hello world')
-    logger.info('hello world')
+    logger.info('ПРИВЕТ МИР!')
     logger.warning('hello world')
+    logger.refresh_req_id()
+
+    log = logging.getLogger('nonexist')
+    log.refresh_req_id()
+    log.debug('hello world')
+    log.info('hello world')
+    log.warning('hello world')
+    log.critical('hello world')
+
+    log2 = logging.getLogger('nonexist2')
+    # log2.refresh_req_id()
+    log2.debug('hello world')
+    log2.info('hello world')
+    log2.warning('hello world')
+    log2.critical('hello world')
 
     try:
         logger.error('hello world')
