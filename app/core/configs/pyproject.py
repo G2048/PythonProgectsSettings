@@ -1,5 +1,6 @@
-import tomllib
 from enum import StrEnum
+
+import tomllib
 
 
 class Managers(StrEnum):

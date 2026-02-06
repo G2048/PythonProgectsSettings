@@ -8,7 +8,8 @@ from fastapi.templating import Jinja2Templates
 from starlette.middleware.cors import CORSMiddleware
 
 from app.api import v1
-from app.configs import LogConfig, get_logger
+from app.configs import get_logger
+from app.core.configs import LogConfig
 
 
 def fake_answer_to_everything_ml_model(x: float):
