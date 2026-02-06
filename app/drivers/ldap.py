@@ -1,19 +1,30 @@
-from typing import Self
+from typing import Self, Protocol
 
 from ldap3 import AUTO_BIND_NO_TLS, NTLM, SAFE_SYNC, Connection, Server
 
-from app.configs.settings import LDAPUserSettings
 
 
 class LdapException(Exception):
     pass
 
+class LdapConfig(Protocol):
+    host: str
+    port: int = 636
+    dc: str
+
+    user: str | None = None
+    password: str | None = None
+
+    @property
+    def username(self):
+        return f"{self.dc}\\{self.user}"
+
 
 # For ldap3 library must be installed the pycryptodome library!
 class LdapConnection:
-    __slots__ = ('connection', 'server')
+    __slots__ = ("connection", "server")
 
-    def __init__(self, settings: LDAPUserSettings):
+    def __init__(self, settings: LdapConfig):
         self.server = Server(settings.host, settings.port, use_ssl=True)
         self.connection = Connection(
             self.server,
