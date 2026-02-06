@@ -3,9 +3,9 @@ from typing import Self, Protocol
 from ldap3 import AUTO_BIND_NO_TLS, NTLM, SAFE_SYNC, Connection, Server
 
 
-
 class LdapException(Exception):
     pass
+
 
 class LdapConfig(Protocol):
     host: str

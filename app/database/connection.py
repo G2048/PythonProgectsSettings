@@ -48,7 +48,7 @@ class AsyncConnection(ABC):
 
 
 class PsycopgAsyncConnection(AsyncConnection):
-    __slots__ = ('_connect', '_pg_dsn', '_cursor')
+    __slots__ = ("_connect", "_pg_dsn", "_cursor")
 
     def __init__(self, pg_dsn: str) -> None:
         self._connect = psycopg.AsyncConnection
@@ -58,11 +58,11 @@ class PsycopgAsyncConnection(AsyncConnection):
 
     async def get_connection(self):
         conn_args = {
-            'keepalives': 1,
-            'keepalives_idle': 30,
-            'keepalives_interval': 5,
-            'keepalives_count': 5,
-            'connect_timeout': 600,
+            "keepalives": 1,
+            "keepalives_idle": 30,
+            "keepalives_interval": 5,
+            "keepalives_count": 5,
+            "connect_timeout": 600,
         }
         return await self._connect.connect(
             conninfo=self._pg_dsn,
@@ -80,5 +80,5 @@ class PsycopgAsyncConnection(AsyncConnection):
     @property
     def columns(self) -> list:
         if not self._cursor:
-            raise RuntimeError('You must use the .get_connection() first')
+            raise RuntimeError("You must use the .get_connection() first")
         return self._cursor.description

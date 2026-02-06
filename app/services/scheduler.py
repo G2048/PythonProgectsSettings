@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from enum import IntEnum
 
-logger = logging.getLogger('stdout')
+logger = logging.getLogger("stdout")
 
 
 class Time(IntEnum):
@@ -19,6 +19,7 @@ class Job(ABC):
     @abstractmethod
     async def run(self):
         pass
+
 
 # For more best way scheduling:
 # https://github.com/dbader/schedule/tree/master
@@ -50,7 +51,7 @@ class Scheduler:
     async def start(self):
         # it is the start time
         logger.info(
-            f'Start app in: {datetime.now() + self._second_wakeup}'  # noqa: E501
+            f"Start app in: {datetime.now() + self._second_wakeup}"  # noqa: E501
         )
         time.sleep(self._second_wakeup.seconds)
         # await asyncio.sleep(self._second_wakeup)
@@ -66,10 +67,10 @@ class Scheduler:
                     # second_wakeup
                     await self._job.run()
             except Exception as e:
-                logger.error(f'Something wrong for {self._job}: {e}')
+                logger.error(f"Something wrong for {self._job}: {e}")
             finally:
                 self._second_wakeup = self._next_wakeup()
-                logger.info(f'Next Wakeup: {datetime.now() + self._second_wakeup}')
+                logger.info(f"Next Wakeup: {datetime.now() + self._second_wakeup}")
                 time.sleep(self._second_wakeup.seconds)
                 # await asyncio.sleep(self._frequency)
 
@@ -79,11 +80,11 @@ class Scheduler:
 
 class TestJob(Job):
     async def run(self):
-        logger.info('job is running')
-        print('job is running')
+        logger.info("job is running")
+        print("job is running")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     HOUR = 14
     MINUTE = 57
 

@@ -40,10 +40,10 @@ Example of usage:
 
 
 DEBUG: bool = False
-LOG_LEVEL = 'INFO'
-SQL_LEVEL = 'WARNING'
-_appname = 'appname'
-_version = '1.0.0'
+LOG_LEVEL = "INFO"
+SQL_LEVEL = "WARNING"
+_appname = "appname"
+_version = "1.0.0"
 
 
 def set_appversion(version: str):
@@ -52,9 +52,9 @@ def set_appversion(version: str):
 
 
 class JSONFormatter(logging.Formatter):
-    _pattern = re.compile(r'%\((\w+)\)s')
+    _pattern = re.compile(r"%\((\w+)\)s")
     COUNTER = 0
-    _req_id = ContextVar('req_id', default=uuid.uuid4().hex[:10])
+    _req_id = ContextVar("req_id", default=uuid.uuid4().hex[:10])
 
     def formatMessage(self, record) -> str:
         global _appname
@@ -63,40 +63,40 @@ class JSONFormatter(logging.Formatter):
         values = record.__dict__
 
         self.COUNTER += 1
-        logger_name: str = values['name']
-        ready_message['app.name'] = _appname
-        ready_message['app.version'] = _version
-        ready_message['app.logger'] = logger_name
-        ready_message['time'] = self.formatTime(record, self.datefmt)
-        ready_message['level'] = values.get('levelname')
-        ready_message['log_id']: int = self.COUNTER
-        ready_message['message'] = str(values['message'])
+        logger_name: str = values["name"]
+        ready_message["app.name"] = _appname
+        ready_message["app.version"] = _version
+        ready_message["app.logger"] = logger_name
+        ready_message["time"] = self.formatTime(record, self.datefmt)
+        ready_message["level"] = values.get("levelname")
+        ready_message["log_id"]: int = self.COUNTER
+        ready_message["message"] = str(values["message"])
 
-        if not values.get('req_id'):
-            values['req_id'] = self._req_id.get()
+        if not values.get("req_id"):
+            values["req_id"] = self._req_id.get()
 
         if record.exc_info:
-            ready_message['exc_text'] = self.formatException(record.exc_info)
+            ready_message["exc_text"] = self.formatException(record.exc_info)
         if record.stack_info:
-            ready_message['stack'] = self.formatStack(record.stack_info)
+            ready_message["stack"] = self.formatStack(record.stack_info)
 
         for value_name in self._pattern.findall(self._fmt):
             value = values.get(value_name)
             ready_message.update({value_name: value})
 
-        if logger_name.startswith('uvicorn') and record.args and len(record.args) == 5:
-            ready_message.pop('message', None)
-            ready_message['client_addr'] = record.args[0]
-            ready_message['method'] = record.args[1]
-            ready_message['path'] = record.args[2]
-            ready_message['http_version'] = record.args[3]
-            ready_message['status'] = record.args[4]
+        if logger_name.startswith("uvicorn") and record.args and len(record.args) == 5:
+            ready_message.pop("message", None)
+            ready_message["client_addr"] = record.args[0]
+            ready_message["method"] = record.args[1]
+            ready_message["path"] = record.args[2]
+            ready_message["http_version"] = record.args[3]
+            ready_message["status"] = record.args[4]
 
         return json.dumps(ready_message, ensure_ascii=False)
 
 
 class RouterFilter(logging.Filter):
-    endpoints = ('/metrics', '/health')
+    endpoints = ("/metrics", "/health")
 
     def filter(self, record) -> bool:
         return record.args is None or (
@@ -112,8 +112,8 @@ class AutoStartQueueListener(logging.handlers.QueueListener):
 
 
 class RequestIdFilter(logging.Filter):
-    def __init__(self, name=''):
-        self.req_id = ContextVar('req_id', default=None)
+    def __init__(self, name=""):
+        self.req_id = ContextVar("req_id", default=None)
         super().__init__(name)
 
     def filter(self, record):
@@ -124,139 +124,139 @@ class RequestIdFilter(logging.Filter):
 
 
 LogConfig = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'details': {
-            'class': 'logging.Formatter',
-            'format': '%(asctime)s::%(levelname)s::%(filename)s::%(levelno)s::%(lineno)s::%(message)s',  # noqa: E501
-            'incremental': True,
-            'encoding': 'UTF-8',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "details": {
+            "class": "logging.Formatter",
+            "format": "%(asctime)s::%(levelname)s::%(filename)s::%(levelno)s::%(lineno)s::%(message)s",  # noqa: E501
+            "incremental": True,
+            "encoding": "UTF-8",
         },
-        'json': {
+        "json": {
             # '()': 'LogSettings.JSONFormatter',
-            '()': JSONFormatter,
-            'format': '%(process)d::%(filename)s::%(lineno)s::%(message)s::%(req_id)s',
+            "()": JSONFormatter,
+            "format": "%(process)d::%(filename)s::%(lineno)s::%(message)s::%(req_id)s",
             # "format": "%(process)d::%(filename)s::%(lineno)s::%(message)s",
         },
     },
-    'filters': {
-        'router': {
-            '()': RouterFilter,
+    "filters": {
+        "router": {
+            "()": RouterFilter,
         },
-        'req_id': {
-            '()': RequestIdFilter,
+        "req_id": {
+            "()": RequestIdFilter,
         },
     },
-    'handlers': {
-        'rotate': {
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': f'{_appname}.log',
-            'mode': 'w',
-            'level': 'DEBUG',
-            'maxBytes': 204800,
-            'backupCount': 15,
-            'formatter': 'details',
-            'filters': ['router'],
+    "handlers": {
+        "rotate": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": f"{_appname}.log",
+            "mode": "w",
+            "level": "DEBUG",
+            "maxBytes": 204800,
+            "backupCount": 15,
+            "formatter": "details",
+            "filters": ["router"],
         },
-        'console': {
-            'class': 'logging.StreamHandler',
-            'level': 'DEBUG',
-            'stream': 'ext://sys.stderr',
-            'formatter': 'details',
-            'filters': ['router'],
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "DEBUG",
+            "stream": "ext://sys.stderr",
+            "formatter": "details",
+            "filters": ["router"],
         },
-        'json': {
-            'class': 'logging.StreamHandler',
-            'level': 'DEBUG',
-            'stream': 'ext://sys.stderr',
-            'formatter': 'json',
-            'filters': ['router'],
+        "json": {
+            "class": "logging.StreamHandler",
+            "level": "DEBUG",
+            "stream": "ext://sys.stderr",
+            "formatter": "json",
+            "filters": ["router"],
         },
-        'jsonq': {
-            'class': 'logging.handlers.QueueHandler',
-            'queue': {
-                '()': queue.Queue,
-                'maxsize': -1,
+        "jsonq": {
+            "class": "logging.handlers.QueueHandler",
+            "queue": {
+                "()": queue.Queue,
+                "maxsize": -1,
             },
-            'level': 'DEBUG',
-            'listener': AutoStartQueueListener,
-            'handlers': ['json'],
+            "level": "DEBUG",
+            "listener": AutoStartQueueListener,
+            "handlers": ["json"],
         },
         # 'handlers': ['cfg://handlers.json', 'cfg://handlers.console'],
     },
-    'loggers': {
-        '': {
-            'level': LOG_LEVEL,
-            'handlers': ['jsonq'],
-            'propagate': False,
+    "loggers": {
+        "": {
+            "level": LOG_LEVEL,
+            "handlers": ["jsonq"],
+            "propagate": False,
         },
-        'stdout': {
-            'level': LOG_LEVEL,
-            'handlers': ['jsonq'],
-            'propagate': False,
+        "stdout": {
+            "level": LOG_LEVEL,
+            "handlers": ["jsonq"],
+            "propagate": False,
         },
-        'app': {
-            'level': LOG_LEVEL,
-            'handlers': ['jsonq'],
-            'propagate': False,
+        "app": {
+            "level": LOG_LEVEL,
+            "handlers": ["jsonq"],
+            "propagate": False,
         },
-        'worker': {
-            'level': LOG_LEVEL,
-            'handlers': ['jsonq'],
-            'propagate': False,
+        "worker": {
+            "level": LOG_LEVEL,
+            "handlers": ["jsonq"],
+            "propagate": False,
         },
-        'faststream': {
-            'level': LOG_LEVEL,
-            'handlers': ['jsonq'],
-            'propagate': False,
+        "faststream": {
+            "level": LOG_LEVEL,
+            "handlers": ["jsonq"],
+            "propagate": False,
         },
-        'faststream.access': {
-            'level': LOG_LEVEL,
-            'handlers': ['jsonq'],
-            'propagate': False,
+        "faststream.access": {
+            "level": LOG_LEVEL,
+            "handlers": ["jsonq"],
+            "propagate": False,
         },
-        'faststream.access.rabbit': {
-            'level': LOG_LEVEL,
-            'handlers': ['jsonq'],
-            'propagate': False,
+        "faststream.access.rabbit": {
+            "level": LOG_LEVEL,
+            "handlers": ["jsonq"],
+            "propagate": False,
         },
-        'asyncio': {
-            'level': LOG_LEVEL,
-            'handlers': ['jsonq'],
-            'propagate': False,
+        "asyncio": {
+            "level": LOG_LEVEL,
+            "handlers": ["jsonq"],
+            "propagate": False,
         },
         # "logfile": {"level": LOG_LEVEL, "handlers": ["rotate"], "propagate": False},
-        'uvicorn': {
-            'handlers': ['jsonq'],
-            'level': LOG_LEVEL,
-            'propagate': False,
+        "uvicorn": {
+            "handlers": ["jsonq"],
+            "level": LOG_LEVEL,
+            "propagate": False,
         },
-        'uvicorn.error': {
+        "uvicorn.error": {
             # DISABLE logger  because something redefine log level to debug... it's too verbose
-            'handlers': ['jsonq'],
-            'level': LOG_LEVEL,
-            'propagate': False,
+            "handlers": ["jsonq"],
+            "level": LOG_LEVEL,
+            "propagate": False,
         },
-        'uvicorn.access': {
-            'handlers': ['jsonq'],
-            'level': LOG_LEVEL,
-            'propagate': False,
+        "uvicorn.access": {
+            "handlers": ["jsonq"],
+            "level": LOG_LEVEL,
+            "propagate": False,
         },
-        'sqlalchemy.engine': {
-            'level': SQL_LEVEL,
-            'handlers': ['jsonq'],
-            'propagate': False,
+        "sqlalchemy.engine": {
+            "level": SQL_LEVEL,
+            "handlers": ["jsonq"],
+            "propagate": False,
         },
-        'sqlalchemy.pool': {
-            'level': SQL_LEVEL,
-            'handlers': ['jsonq'],
-            'propagate': False,
+        "sqlalchemy.pool": {
+            "level": SQL_LEVEL,
+            "handlers": ["jsonq"],
+            "propagate": False,
         },
-        'httpx': {
-            'level': 'WARNING',
-            'handlers': ['jsonq'],
-            'propagate': False,
+        "httpx": {
+            "level": "WARNING",
+            "handlers": ["jsonq"],
+            "propagate": False,
         },
     },
 }
@@ -268,7 +268,7 @@ class CustomLogger(Logger):
         self.addFilter(RequestIdFilter())
 
 
-def get_logger(name='app') -> CustomLogger:
+def get_logger(name="app") -> CustomLogger:
     logging.setLoggerClass(CustomLogger)
     logging.config.dictConfig(LogConfig)
     logger: CustomLogger = logging.getLogger(name)
@@ -278,44 +278,44 @@ def get_logger(name='app') -> CustomLogger:
 def set_appname(name: str):
     global _appname
     _appname = name
-    LogConfig['handlers']['rotate']['filename'] = f'{name}.log'
+    LogConfig["handlers"]["rotate"]["filename"] = f"{name}.log"
 
 
 def set_debug_level(debug: bool):
     if debug:
-        for logger in LogConfig['loggers'].values():
-            logger['level'] = 'DEBUG'
+        for logger in LogConfig["loggers"].values():
+            logger["level"] = "DEBUG"
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logger = get_logger()
 
-    logger.debug('hello world')
-    logger.info('ПРИВЕТ МИР!')
-    logger.warning('hello world')
+    logger.debug("hello world")
+    logger.info("ПРИВЕТ МИР!")
+    logger.warning("hello world")
     logger.refresh_req_id()
 
-    log = logging.getLogger('nonexist')
+    log = logging.getLogger("nonexist")
     log.refresh_req_id()
-    log.debug('hello world')
-    log.info('hello world')
-    log.warning('hello world')
-    log.critical('hello world')
+    log.debug("hello world")
+    log.info("hello world")
+    log.warning("hello world")
+    log.critical("hello world")
 
-    log2 = logging.getLogger('nonexist2')
+    log2 = logging.getLogger("nonexist2")
     # log2.refresh_req_id()
-    log2.debug('hello world')
-    log2.info('hello world')
-    log2.warning('hello world')
-    log2.critical('hello world')
+    log2.debug("hello world")
+    log2.info("hello world")
+    log2.warning("hello world")
+    log2.critical("hello world")
 
     try:
-        logger.error('hello world')
-        raise EOFError('EOF!')
+        logger.error("hello world")
+        raise EOFError("EOF!")
     except EOFError:
-        logger.critical('CRITICAL MESSAGE', exc_info=True)
+        logger.critical("CRITICAL MESSAGE", exc_info=True)
 
     try:
-        raise EOFError('EOF!')
+        raise EOFError("EOF!")
     except Exception:
-        logger.exception('hello world')
+        logger.exception("hello world")

@@ -19,22 +19,22 @@ class AppSettings(BaseSettings):
 
     @computed_field(return_type=str)
     def appname_log(self) -> str:
-        return self.appname.lower().replace(' ', '_')
+        return self.appname.lower().replace(" ", "_")
 
 
 class DataBaseSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix='PG_')
+    model_config = SettingsConfigDict(env_prefix="PG_")
 
     host: str
     port: str
     user: str
     dbname: str
     password: str
-    engine: Optional[str] = 'psycopg'
+    engine: Optional[str] = "psycopg"
 
     @computed_field(return_type=str)
     def pg_dsn(self):
-        return f'postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.dbname}'
+        return f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.dbname}"
 
 
 _app_settings = AppSettings()

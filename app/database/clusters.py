@@ -3,7 +3,7 @@ import logging
 from .connection import AsyncConnection
 
 
-logger = logging.getLogger('stdout')
+logger = logging.getLogger("stdout")
 
 
 class DataBase:
@@ -24,7 +24,7 @@ class DataBase:
 
     async def close(self):
         if not self._connection:
-            raise RuntimeError('You must use the .connect() first')
+            raise RuntimeError("You must use the .connect() first")
         await self._connection.close()
 
     async def __aenter__(self):
@@ -41,7 +41,7 @@ class DataBase:
 
     async def execute(self, sql, *args) -> None:
         if not self._connection:
-            raise RuntimeError('You must use the .connect() first')
+            raise RuntimeError("You must use the .connect() first")
         await self._engine.execute(self._connection, sql, *args)
 
     async def fetchall(self, sql: str, *args) -> list:

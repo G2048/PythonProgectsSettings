@@ -15,7 +15,7 @@ class BaseApi:
     logger = get_logger()
 
     def __init__(self, url: str):
-        self.HEADERS = {'Content-Type': 'application/json'}
+        self.HEADERS = {"Content-Type": "application/json"}
         self.URL: str = url
         self._status_code: int = -1
 
@@ -30,9 +30,9 @@ class BaseApi:
         return self.URL + url
         # return urljoin(self.URL, url)
 
-    async def _request(self, url, query_params=None, method='GET', **kwargs) -> dict:
+    async def _request(self, url, query_params=None, method="GET", **kwargs) -> dict:
         url = self._concat_url(url)
-        self.logger.debug(f'{url}, {query_params=}, {self.HEADERS=}')
+        self.logger.debug(f"{url}, {query_params=}, {self.HEADERS=}")
 
         try:
             async with AsyncClient(follow_redirects=True) as client:
@@ -44,10 +44,10 @@ class BaseApi:
                     **kwargs,
                 )
         except Exception as e:
-            self.logger.error(f'Error while request: {e=}')
+            self.logger.error(f"Error while request: {e=}")
             raise e
         finally:
-            self.HEADERS = {'Content-Type': 'application/json'}
+            self.HEADERS = {"Content-Type": "application/json"}
 
         self.status_code = self._response.status_code
         self.logger.debug(self.status_code)
@@ -56,7 +56,7 @@ class BaseApi:
             response_json = self._validateJson(self._response.json)
             if response_json:
                 return response_json
-            return {'text': self._response.text}
+            return {"text": self._response.text}
         else:
             raise HTTPException(self._response.status_code, self._response.text)
 

@@ -5,4 +5,4 @@ class HTTPException(Exception):
         super().__init__(status_code, detail)
 
     def __str__(self):
-        return f'{self.status_code}: {self.detail}'
+        return f"{self.status_code}: {self.detail}"
