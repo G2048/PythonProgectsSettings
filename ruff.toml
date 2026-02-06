@@ -3,6 +3,7 @@ indent-width = 4
 
 [lint]
 extend-select = ["Q", "I"]
+ignore-init-module-imports = true
 ignore = [
     "C901", # too complex
     "B904", # except clause
@@ -19,12 +20,12 @@ select = [
 ]
 
 [format]
-quote-style = "single"
+quote-style = "double"
 line-ending = "lf"
 
 [lint.flake8-quotes]
 docstring-quotes = "double"
-inline-quotes = "single"
+inline-quotes = "double"
 
 
 [lint.isort]
@@ -36,4 +37,3 @@ known-third-party = ["bound"]
 "__init__.py" = ["F401", "PLC0414"]
 "examples/**" = ["N805", "N999", "RUF012"]
 "tests/**" = ["RUF012", "SIM115"]
-
