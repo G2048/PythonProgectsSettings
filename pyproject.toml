@@ -34,23 +34,25 @@ quote-style="double"
 preview = true # auto enable rule E305 - blank-lines-after-function-or-class
 ignore-init-module-imports = true
 extend-select = ["Q", "I"]
-select = [
-    "E",   # pycodestyle errors
-    "W",   # pycodestyle warnings
-    "F",   # pyflakes
-    "C",   # flake8-comprehensions
-    "I",   # isort
-    "B",   # flake8-bugbear
-    "UP",  # pyupgrade
-    "RUF", # Ruff-specific rules
-    "I001",
-    "E303",
-    "E302",
-]
-
 ignore = [
-    "C901",  # Too complex
-    "B904",  # Except clause
+    "C901",   # too complex
+    "B904",   # except clause
+    "RUF001", # ambiguous-unicode-character-string
+    "RUF002", # ambiguous-unicode-character-docstring
+    "RUF003", # ambiguous-unicode-character-comment
+]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "C",    # flake8-comprehensions
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+    "RUF",  # Ruff-specific rules
+    "I001", # unsorted-imports
+    "E303", # too-many-blank-lines
+    "E302", # blank-lines-top-level
 ]
 
 [tool.ruff.lint.flake8-quotes]
