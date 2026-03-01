@@ -6,8 +6,11 @@ preview = true # auto enable rule E305 - blank-lines-after-function-or-class
 extend-select = ["Q", "I"]
 ignore-init-module-imports = true
 ignore = [
-    "C901", # too complex
-    "B904", # except clause
+    "C901",   # too complex
+    "B904",   # except clause
+    "RUF001", # ambiguous-unicode-character-string
+    "RUF002", # ambiguous-unicode-character-docstring
+    "RUF003", # ambiguous-unicode-character-comment
 ]
 select = [
     "E",   # pycodestyle errors
