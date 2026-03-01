@@ -43,6 +43,9 @@ select = [
     "B",   # flake8-bugbear
     "UP",  # pyupgrade
     "RUF", # Ruff-specific rules
+    "I001",
+    "E303",
+    "E302",
 ]
 
 ignore = [
