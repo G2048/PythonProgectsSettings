@@ -1,6 +1,7 @@
 import json
+from collections.abc import Callable
 from json import JSONDecodeError
-from typing import Any, Callable, TypeAlias
+from typing import Any, TypeAlias
 
 from httpx import AsyncClient
 
@@ -52,13 +53,13 @@ class BaseApi:
         self.status_code = self._response.status_code
         self.logger.debug(self.status_code)
         self.logger.debug(self._response.text)
-        if self._response.status_code < 300:
-            response_json = self._validateJson(self._response.json)
-            if response_json:
-                return response_json
-            return {"text": self._response.text}
-        else:
+        if self._response.status_code > 300:
             raise HTTPException(self._response.status_code, self._response.text)
+
+        response_json = self._validateJson(self._response.json)
+        if response_json:
+            return response_json
+        return {"text": self._response.text}
 
     @property
     def status_code(self) -> int:
